@@ -91,6 +91,8 @@ foreach ($t in $templates) {
 # --- check scripts ---
 $scriptsCheck = @(
     "scripts\athena-install.ps1"
+    "scripts\athena-uninstall.ps1"
+    "scripts\athena-verify.ps1"
     "scripts\athena-install.sh"
     "scripts\athena-uninstall.sh"
     "scripts\athena-verify.sh"
@@ -136,7 +138,7 @@ if ($Json) {
 } else {
     Write-Host "Athena verify"
     Write-Host "  Skill file        : $(if ($actual -eq $expected) {'OK'} else {'FAIL'})"
-    Write-Host "  Script files      : $(if ($scriptsOK) {'6/6 OK'} else {'FAIL'})"
+    Write-Host "  Script files      : $(if ($scriptsOK) {'8/8 OK'} else {'FAIL'})"
     Write-Host "  Templates         : $(if ($templatesOK) {'3/3 OK'} else {'FAIL'})"
     Write-Host "  Receipt           : OK"
     Write-Host "  Profile           : $profile"

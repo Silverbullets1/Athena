@@ -81,8 +81,12 @@ if (Test-Path -LiteralPath $skillDir) {
 }
 
 # --- remove scripted files ---
+# Note: athena-uninstall.ps1 is intentionally NOT in this list — it cannot
+# remove itself while running. The operator deletes it manually after.
+# All other scripts (incl. both .ps1 and .sh variants) are removed.
 $scriptFiles = @(
     "scripts\athena-install.ps1"
+    "scripts\athena-verify.ps1"
     "scripts\athena-install.sh"
     "scripts\athena-uninstall.sh"
     "scripts\athena-verify.sh"

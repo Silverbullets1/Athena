@@ -134,12 +134,14 @@ try {
 # Both POSIX and PowerShell installers are shipped so the operator can
 # re-run on any platform. Windows gets .ps1, Linux/macOS get .sh.
 $scriptsManifest = @(
-    @{ Src = "scripts\install.ps1";   Dst = "scripts\athena-install.ps1" }
-    @{ Src = "scripts\install.sh";    Dst = "scripts\athena-install.sh" }
-    @{ Src = "scripts\uninstall.sh";  Dst = "scripts\athena-uninstall.sh" }
-    @{ Src = "scripts\verify.sh";     Dst = "scripts\athena-verify.sh" }
-    @{ Src = "scripts\release.py";    Dst = "scripts\athena-release.py" }
-    @{ Src = "scripts\build_dmg.sh";  Dst = "scripts\build-dmg.sh" }
+    @{ Src = "scripts\install.ps1";    Dst = "scripts\athena-install.ps1" }
+    @{ Src = "scripts\uninstall.ps1";  Dst = "scripts\athena-uninstall.ps1" }
+    @{ Src = "scripts\verify.ps1";     Dst = "scripts\athena-verify.ps1" }
+    @{ Src = "scripts\install.sh";     Dst = "scripts\athena-install.sh" }
+    @{ Src = "scripts\uninstall.sh";   Dst = "scripts\athena-uninstall.sh" }
+    @{ Src = "scripts\verify.sh";      Dst = "scripts\athena-verify.sh" }
+    @{ Src = "scripts\release.py";     Dst = "scripts\athena-release.py" }
+    @{ Src = "scripts\build_dmg.sh";   Dst = "scripts\build-dmg.sh" }
 )
 try {
     foreach ($entry in $scriptsManifest) {
@@ -168,6 +170,8 @@ $receipt = @{
         "MEMORY.md"                     = @{ mode = "0644" }
         "USER.md"                       = @{ mode = "0644" }
         "scripts/athena-install.ps1"    = @{ mode = "0755" }
+        "scripts/athena-uninstall.ps1"  = @{ mode = "0755" }
+        "scripts/athena-verify.ps1"     = @{ mode = "0755" }
         "scripts/athena-install.sh"     = @{ mode = "0755" }
         "scripts/athena-uninstall.sh"   = @{ mode = "0755" }
         "scripts/athena-verify.sh"      = @{ mode = "0755" }
