@@ -1,0 +1,49 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+*.egg
+*.whl
+
+# PyInstaller
+*.spec.bak
+
+# macOS
+.DS_Store
+*.dmg
+Athena.app/
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Local install artifacts
+.installed
+.receipt.lock
+
+# Test artifacts
+test/runs/*.jsonl
+!test/runs/.gitkeep
+
+# Athena receipt (when installed locally for testing)
+.athena.receipt
+.athena.audit.log
+*.pre-athena-*

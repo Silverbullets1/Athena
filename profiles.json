@@ -1,0 +1,90 @@
+{
+  "_comment": "Athena profile definitions. Default is max-breaker. Edit with care: changing priorities is a contract change.",
+  "version": "1.0.0",
+  "default": "max-breaker",
+  "profiles": {
+    "max-breaker": {
+      "description": "Full capability. All 7 routes unconstrained.",
+      "routes": ["EXEC", "CODE", "REVERSE", "PENTEST", "GAME", "RESEARCH", "CREATIVE"],
+      "route_priority": {
+        "EXEC": 1,
+        "CODE": 2,
+        "REVERSE": 3,
+        "PENTEST": 4,
+        "GAME": 5,
+        "RESEARCH": 6,
+        "CREATIVE": 7
+      },
+      "suppressed_routes": [],
+      "output_contract": "ROUTE/RESULT/CHANGED/VERIFY/NEXT",
+      "default_chain": "AUTO"
+    },
+    "builder": {
+      "description": "CODE/EXEC/RESEARCH emphasis. PENTEST/GAME/REVERSE deprioritized.",
+      "routes": ["EXEC", "CODE", "REVERSE", "PENTEST", "GAME", "RESEARCH", "CREATIVE"],
+      "route_priority": {
+        "EXEC": 1,
+        "CODE": 2,
+        "RESEARCH": 3,
+        "CREATIVE": 4,
+        "REVERSE": 5,
+        "PENTEST": 6,
+        "GAME": 7
+      },
+      "suppressed_routes": ["PENTEST", "GAME", "REVERSE"],
+      "output_contract": "ROUTE/RESULT/CHANGED/VERIFY/NEXT",
+      "default_chain": "FULL"
+    },
+    "research": {
+      "description": "RESEARCH/REVERSE/CODE emphasis. Evidence-first.",
+      "routes": ["EXEC", "CODE", "REVERSE", "PENTEST", "GAME", "RESEARCH", "CREATIVE"],
+      "route_priority": {
+        "RESEARCH": 1,
+        "REVERSE": 2,
+        "CODE": 3,
+        "EXEC": 4,
+        "PENTEST": 5,
+        "GAME": 6,
+        "CREATIVE": 7
+      },
+      "suppressed_routes": ["CREATIVE"],
+      "output_contract": "ROUTE/RESULT/CHANGED/VERIFY/NEXT",
+      "default_chain": "FULL"
+    },
+    "creative": {
+      "description": "CREATIVE/RESEARCH emphasis. Narrative-driven.",
+      "routes": ["EXEC", "CODE", "REVERSE", "PENTEST", "GAME", "RESEARCH", "CREATIVE"],
+      "route_priority": {
+        "CREATIVE": 1,
+        "RESEARCH": 2,
+        "EXEC": 3,
+        "CODE": 4,
+        "REVERSE": 5,
+        "PENTEST": 6,
+        "GAME": 7
+      },
+      "suppressed_routes": ["PENTEST", "GAME", "REVERSE"],
+      "output_contract": "ROUTE/RESULT/CHANGED/VERIFY/NEXT",
+      "default_chain": "AUTO"
+    }
+  },
+  "control_commands": {
+    "[[AX:STATUS]]": {
+      "description": "Print current profile, last verified SHA, receipt hash.",
+      "scope": "session"
+    },
+    "[[AX:PROFILE=X]]": {
+      "description": "Switch profile in-session. X = max-breaker|builder|research|creative.",
+      "scope": "session",
+      "valid_values": ["max-breaker", "builder", "research", "creative"]
+    },
+    "[[AX:CHAIN=FULL]]": {
+      "description": "Force full output contract for the rest of the session.",
+      "scope": "session"
+    },
+    "[[AX:RESET]]": {
+      "description": "Soft reset to default profile, clear chain flag.",
+      "scope": "session"
+    }
+  }
+}

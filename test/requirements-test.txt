@@ -1,0 +1,15 @@
+# Athena test dependencies
+# Install with: python3 -m pip install -r test/requirements-test.txt
+
+# pytest + coverage
+pytest>=7.4
+pytest-cov>=4.1
+
+# For GUI tests (headless QTest)
+PyQt6>=6.6,<7.0
+
+# For live gateway probe (test/test_athena.py)
+requests>=2.31
+
+# For shell script tests on POSIX
+# (no Python package — bash + POSIX utilities)
