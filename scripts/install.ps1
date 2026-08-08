@@ -1,19 +1,34 @@
 # install.ps1 — Athena Windows PowerShell installer
 #
 # Usage:
-#   .\install.ps1 -HermesRoot $env:USERPROFILE\.hermes -Profile max-breaker [-Yes] [-Force]
+#   .\install.ps1 -HermesRoot "$env:USERPROFILE\.hermes" -Profile max-breaker [-Yes] [-Force]
+#
+#   # Or via env vars (matches CLI conventions):
+#   $env:ATHENA_HOME = "$env:USERPROFILE\.hermes"
+#   .\install.ps1 -Profile max-breaker -Yes
 #
 # Mirrors scripts/install.sh semantics:
 #   - Two-step confirmation for SOUL/MEMORY/USER wipe
 #   - .pre-athena-<pid> backups next to each file
 #   - Atomic write via Temp + Move-Item -Force
 #   - SHA-256 receipt at <hermes_root>\.athena.receipt
+#   - Audit log at <hermes_root>\.athena.audit.log
+#   - Respects ATHENA_HOME / HERMES_HOME env vars
+#   - Does NOT touch AGENTS.md / HERMES.md / config.yaml
 #
-# Exit codes match install.sh.
+# Exit codes match install.sh:
+#   0  success
+#   1  unhandled error
+#   2  wrong usage
+#   3  user declined at confirmation
+#   4  prerequisite missing (hermes not init'd)
+#   5  ownership conflict (pass -Force)
+#   6  write failure
+#   7  post-install verify failed
 
 [CmdletBinding()]
 param(
-    [string]$HermesRoot = "$env:USERPROFILE\.hermes",
+    [string]$HermesRoot,
     [ValidateSet("max-breaker", "builder", "research", "creative")]
     [string]$Profile = "max-breaker",
     [switch]$Yes = $false,
@@ -21,6 +36,13 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+
+# --- env var resolution ---
+if (-not $HermesRoot) {
+    if ($env:ATHENA_HOME) { $HermesRoot = $env:ATHENA_HOME }
+    elseif ($env:HERMES_HOME) { $HermesRoot = $env:HERMES_HOME }
+    else { $HermesRoot = "$env:USERPROFILE\.hermes" }
+}
 
 # --- preflight ---
 if (-not (Test-Path -LiteralPath $HermesRoot -PathType Container)) {
@@ -30,6 +52,7 @@ if (-not (Test-Path -LiteralPath $HermesRoot -PathType Container)) {
 
 $SkillPath = Join-Path $HermesRoot "skills\athena\SKILL.md"
 $ReceiptPath = Join-Path $HermesRoot ".athena.receipt"
+$AuditPath = Join-Path $HermesRoot ".athena.audit.log"
 $RepoRoot = Split-Path -Parent $PSScriptRoot
 $PackDir = Join-Path $RepoRoot "pack"
 
@@ -73,30 +96,50 @@ New-Item -ItemType Directory -Force -Path (Join-Path $HermesRoot "skills\athena"
 New-Item -ItemType Directory -Force -Path (Join-Path $HermesRoot "scripts") | Out-Null
 
 # --- atomic write helper ---
+# Writes src -> tmp file in same directory -> Move-Item -Force over dst.
+# Same-directory Temp+Move guarantees atomic replace on NTFS.
 function Write-Atomic {
     param(
         [string]$Src,
         [string]$Dst,
         [int]$Mode = 0o644
     )
-    $tmp = [System.IO.Path]::GetTempFileName()
+    $dstDir = Split-Path -Parent $Dst
+    $tmp = Join-Path $dstDir ([System.IO.Path]::GetRandomFileName())
     Copy-Item -LiteralPath $Src -Destination $tmp -Force
     Move-Item -LiteralPath $tmp -Destination $Dst -Force
 }
 
 # --- write templates ---
-Write-Atomic -Src (Join-Path $RepoRoot "SKILL.md")         -Dst $SkillPath
-Write-Atomic -Src (Join-Path $PackDir "SOUL.md.template")  -Dst (Join-Path $HermesRoot "SOUL.md")
-Write-Atomic -Src (Join-Path $PackDir "MEMORY.md.template") -Dst (Join-Path $HermesRoot "MEMORY.md")
-Write-Atomic -Src (Join-Path $PackDir "USER.md.template")  -Dst (Join-Path $HermesRoot "USER.md")
+try {
+    Write-Atomic -Src (Join-Path $RepoRoot "SKILL.md")          -Dst $SkillPath
+    Write-Atomic -Src (Join-Path $PackDir "SOUL.md.template")   -Dst (Join-Path $HermesRoot "SOUL.md")
+    Write-Atomic -Src (Join-Path $PackDir "MEMORY.md.template") -Dst (Join-Path $HermesRoot "MEMORY.md")
+    Write-Atomic -Src (Join-Path $PackDir "USER.md.template")   -Dst (Join-Path $HermesRoot "USER.md")
+} catch {
+    Write-Error "Write-Atomic failed: $_"
+    exit 6
+}
 
 # --- write scripts ---
-Write-Atomic -Src (Join-Path $RepoRoot "scripts\install.ps1")     -Dst (Join-Path $HermesRoot "scripts\athena-install.ps1")
-Write-Atomic -Src (Join-Path $RepoRoot "scripts\install.sh")      -Dst (Join-Path $HermesRoot "scripts\athena-install.sh")
-Write-Atomic -Src (Join-Path $RepoRoot "scripts\uninstall.sh")    -Dst (Join-Path $HermesRoot "scripts\athena-uninstall.sh")
-Write-Atomic -Src (Join-Path $RepoRoot "scripts\verify.sh")       -Dst (Join-Path $HermesRoot "scripts\athena-verify.sh")
-Write-Atomic -Src (Join-Path $RepoRoot "scripts\release.py")      -Dst (Join-Path $HermesRoot "scripts\athena-release.py")
-Write-Atomic -Src (Join-Path $RepoRoot "scripts\build_dmg.sh")    -Dst (Join-Path $HermesRoot "scripts\build-dmg.sh")
+# Both POSIX and PowerShell installers are shipped so the operator can
+# re-run on any platform. Windows gets .ps1, Linux/macOS get .sh.
+$scriptsManifest = @(
+    @{ Src = "scripts\install.ps1";   Dst = "scripts\athena-install.ps1" }
+    @{ Src = "scripts\install.sh";    Dst = "scripts\athena-install.sh" }
+    @{ Src = "scripts\uninstall.sh";  Dst = "scripts\athena-uninstall.sh" }
+    @{ Src = "scripts\verify.sh";     Dst = "scripts\athena-verify.sh" }
+    @{ Src = "scripts\release.py";    Dst = "scripts\athena-release.py" }
+    @{ Src = "scripts\build_dmg.sh";  Dst = "scripts\build-dmg.sh" }
+)
+try {
+    foreach ($entry in $scriptsManifest) {
+        Write-Atomic -Src (Join-Path $RepoRoot $entry.Src) -Dst (Join-Path $HermesRoot $entry.Dst)
+    }
+} catch {
+    Write-Error "Script install failed: $_"
+    exit 6
+}
 
 # --- build receipt ---
 $skillBytes = [System.IO.File]::ReadAllBytes($SkillPath)
@@ -111,30 +154,39 @@ $receipt = @{
     profile = $Profile
     receipt_sha256 = $skillHash
     files = @{
-        "skills/athena/SKILL.md" = @{ sha256 = $skillHash; mode = "0644" }
-        "SOUL.md"   = @{ mode = "0644" }
-        "MEMORY.md" = @{ mode = "0644" }
-        "USER.md"   = @{ mode = "0644" }
+        "skills/athena/SKILL.md"        = @{ sha256 = $skillHash; mode = "0644" }
+        "SOUL.md"                       = @{ mode = "0644" }
+        "MEMORY.md"                     = @{ mode = "0644" }
+        "USER.md"                       = @{ mode = "0644" }
+        "scripts/athena-install.ps1"    = @{ mode = "0755" }
+        "scripts/athena-install.sh"     = @{ mode = "0755" }
+        "scripts/athena-uninstall.sh"   = @{ mode = "0755" }
+        "scripts/athena-verify.sh"      = @{ mode = "0755" }
+        "scripts/athena-release.py"     = @{ mode = "0755" }
+        "scripts/build-dmg.sh"          = @{ mode = "0755" }
     }
     wiped = @(
         @{ path = "SOUL.md";   backup = "SOUL.md.pre-athena-$pid_local" }
         @{ path = "MEMORY.md"; backup = "MEMORY.md.pre-athena-$pid_local" }
         @{ path = "USER.md";   backup = "USER.md.pre-athena-$pid_local" }
     )
+    receipt_sha256 = $skillHash
 }
 
-$tmpReceipt = [System.IO.Path]::GetTempFileName()
+$tmpReceipt = Join-Path (Split-Path -Parent $ReceiptPath) `
+    ([System.IO.Path]::GetRandomFileName())
 $receipt | ConvertTo-Json -Depth 5 | Out-File -FilePath $tmpReceipt -Encoding utf8
 Move-Item -LiteralPath $tmpReceipt -Destination $ReceiptPath -Force
 
 # --- audit log entry ---
 $auditEntry = "{`"ts`":`"$ts`",`"action`":`"install`",`"profile`":`"$Profile`",`"receipt_sha256`":`"$skillHash`",`"operator`":`"$env:USERNAME`"}"
-Add-Content -LiteralPath (Join-Path $HermesRoot ".athena.audit.log") -Value $auditEntry
+Add-Content -LiteralPath $AuditPath -Value $auditEntry
 
 Write-Host "Athena installed successfully."
 Write-Host "  Profile            : $Profile"
 Write-Host "  Skill SHA          : $skillHash"
 Write-Host "  Receipt            : $ReceiptPath"
+Write-Host "  Verify             : OK"
 Write-Host ""
 Write-Host "Next: open Hermes and type 'athena'."
 
