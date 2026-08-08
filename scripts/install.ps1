@@ -56,6 +56,15 @@ $AuditPath = Join-Path $HermesRoot ".athena.audit.log"
 $RepoRoot = Split-Path -Parent $PSScriptRoot
 $PackDir = Join-Path $RepoRoot "pack"
 
+# --- banner ---
+$BannersDir = Join-Path $RepoRoot "banners"
+foreach ($name in @("athena", "nerv")) {
+    $p = Join-Path $BannersDir "$name.ascii"
+    if (Test-Path -LiteralPath $p) {
+        try { Get-Content -LiteralPath $p -Raw } catch { }
+    }
+}
+
 if ((Test-Path -LiteralPath $SkillPath) -and -not $Force) {
     Write-Error "$SkillPath already exists. Pass -Force to overwrite."
     exit 5

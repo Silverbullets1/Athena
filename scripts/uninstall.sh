@@ -15,6 +15,18 @@
 
 set -eu
 
+# --- banner ---
+SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+REPO_ROOT="$(dirname "$SCRIPT_DIR")"
+BANNERS_DIR="$REPO_ROOT/banners"
+if [ -d "$BANNERS_DIR" ]; then
+    for n in athena nerv; do
+        if [ -f "$BANNERS_DIR/$n.ascii" ]; then
+            cat "\$BANNERS_DIR/\$n.ascii" 2>/dev/null 1>&2 || true
+        fi
+    done
+fi
+
 HERMES_ROOT="${1:-$HOME/.hermes}"
 YES=0
 shift 2>/dev/null || shift "$#" 2>/dev/null || true

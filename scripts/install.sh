@@ -39,6 +39,16 @@ SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 REPO_ROOT="$(dirname "$SCRIPT_DIR")"
 PACK_DIR="$REPO_ROOT/pack"
 
+# --- banner ---
+BANNERS_DIR="$REPO_ROOT/banners"
+if [ -d "$BANNERS_DIR" ]; then
+    for n in athena nerv; do
+        if [ -f "$BANNERS_DIR/$n.ascii" ]; then
+            cat "\$BANNERS_DIR/\$n.ascii" 2>/dev/null 1>&2 || true
+        fi
+    done
+fi
+
 # --- preflight ---
 if [ ! -d "$HERMES_ROOT" ]; then
     echo "ERROR: Hermes root $HERMES_ROOT does not exist." >&2

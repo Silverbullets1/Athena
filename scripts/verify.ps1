@@ -29,6 +29,16 @@ if (-not $HermesRoot) {
     else { $HermesRoot = "$env:USERPROFILE\.hermes" }
 }
 
+# --- banner ---
+$RepoRoot = Split-Path -Parent $PSScriptRoot
+$BannersDir = Join-Path $RepoRoot "banners"
+foreach ($name in @("athena", "nerv")) {
+    $p = Join-Path $BannersDir "$name.ascii"
+    if (Test-Path -LiteralPath $p) {
+        try { Get-Content -LiteralPath $p -Raw } catch { }
+    }
+}
+
 $ReceiptPath = Join-Path $HermesRoot ".athena.receipt"
 $SkillPath = Join-Path $HermesRoot "skills\athena\SKILL.md"
 $LogPath = Join-Path $HermesRoot ".athena.audit.log"

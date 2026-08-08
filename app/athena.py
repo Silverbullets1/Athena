@@ -45,6 +45,23 @@ __version__ = "1.0.0"
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_HERMES_HOME = Path.home() / ".hermes"
+BANNERS_DIR = REPO_ROOT / "banners"
+
+
+def print_banner() -> None:
+    """Print the Athena + NERV banner. Pure cosmetics; safe to call any time.
+
+    Writes to STDERR so JSON output (status --json, plan --json, verify --json)
+    on STDOUT remains clean for piping.
+    """
+    for name in ("athena", "nerv"):
+        path = BANNERS_DIR / f"{name}.ascii"
+        if path.exists():
+            try:
+                sys.stderr.write(path.read_text(encoding="utf-8"))
+            except OSError:
+                pass
+    sys.stderr.flush()
 
 
 def hermes_home() -> Path:
@@ -366,6 +383,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: Optional[list[str]] = None) -> int:
+    print_banner()
     parser = build_parser()
     args = parser.parse_args(argv)
     return args.func(args)

@@ -35,6 +35,16 @@ SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 REPO_ROOT="$(dirname "$SCRIPT_DIR")"
 cd "$REPO_ROOT"
 
+# --- banner ---
+BANNERS_DIR="$REPO_ROOT/banners"
+if [ -d "$BANNERS_DIR" ]; then
+    for n in athena nerv; do
+        if [ -f "$BANNERS_DIR/$n.ascii" ]; then
+            cat "\$BANNERS_DIR/\$n.ascii" 2>/dev/null 1>&2 || true
+        fi
+    done
+fi
+
 # --- resolve version ---
 VERSION="$(python3 -c 'import sys; sys.path.insert(0, "app"); from athena import __version__; print(__version__)')"
 

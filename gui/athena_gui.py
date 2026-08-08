@@ -41,6 +41,7 @@ except ImportError:
 REPO_ROOT = Path(__file__).resolve().parent.parent
 CLI = REPO_ROOT / "app" / "athena.py"
 THEME_PATH = Path(__file__).resolve().parent / "themes" / "yellow.qss"
+BANNERS_DIR = REPO_ROOT / "banners"
 
 
 ROUTES = ["EXEC", "CODE", "REVERSE", "PENTEST", "GAME", "RESEARCH", "CREATIVE"]
@@ -69,6 +70,19 @@ def load_theme(app: QApplication) -> None:
             pass
 
 
+def print_banner() -> str:
+    """Return the Athena + NERV banner as a single string. Pure cosmetics."""
+    parts: List[str] = []
+    for name in ("athena", "nerv"):
+        path = BANNERS_DIR / f"{name}.ascii"
+        if path.exists():
+            try:
+                parts.append(path.read_text(encoding="utf-8"))
+            except OSError:
+                pass
+    return "".join(parts)
+
+
 class AthenaMainWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
@@ -83,6 +97,11 @@ class AthenaMainWindow(QMainWindow):
 
         self._build_ui()
         self._wire_buttons()
+
+        # Seed the log with the banner so the operator sees it first.
+        banner = print_banner()
+        if banner:
+            self._on_log_message(banner.rstrip())
 
         # Status polling timer
         self._status_timer = QTimer(self)
@@ -336,6 +355,8 @@ class AthenaMainWindow(QMainWindow):
 
 
 def main() -> int:
+    sys.stdout.write(print_banner())
+    sys.stdout.flush()
     app = QApplication(sys.argv)
     app.setApplicationName("Athena")
     load_theme(app)

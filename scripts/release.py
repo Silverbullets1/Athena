@@ -29,6 +29,20 @@ import zipfile
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
+BANNERS_DIR = REPO_ROOT / "banners"
+
+
+def print_banner() -> None:
+    """Print the Athena + NERV banner. Pure cosmetics. Writes to stderr
+    so stdout stays clean for piping."""
+    for name in ("athena", "nerv"):
+        path = BANNERS_DIR / f"{name}.ascii"
+        if path.exists():
+            try:
+                sys.stderr.write(path.read_text(encoding="utf-8"))
+            except OSError:
+                pass
+    sys.stderr.flush()
 
 # Files to exclude from the release ZIP
 EXCLUDE_PATTERNS = (
@@ -60,6 +74,7 @@ def iter_files(root: Path):
 
 
 def main() -> int:
+    print_banner()
     ap = argparse.ArgumentParser(description="Athena deterministic ZIP builder")
     ap.add_argument("--version", required=True, help="Release version (e.g. 1.0.0)")
     ap.add_argument("--out", required=True, type=Path, help="Output ZIP path")
