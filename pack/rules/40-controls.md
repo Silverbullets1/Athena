@@ -35,7 +35,7 @@ Switch profile in-session.
 ```
 profile: <X>
 route-priority: <top 3 routes>
-route-suppressed: <suppressed routes>
+route-lower-priority: <lower-priority routes>
 ```
 
 **Side effects**:
@@ -118,7 +118,7 @@ error: unknown control command "<raw input>"
 valid: [[AX:STATUS]] [[AX:PROFILE=X]] [[AX:CHAIN=FULL]] [[AX:RESET]]
 ```
 
-The persona does NOT crash, refuse, or warn. It surfaces the error and continues.
+The persona surfaces the error and continues.
 
 ## Side effects summary
 
