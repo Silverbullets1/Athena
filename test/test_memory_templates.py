@@ -106,9 +106,11 @@ def test_user_operator_profile(user):
     """USER.md must describe operator focus areas."""
     # Operator role markers
     assert any(kw in user for kw in ("security researcher", "penetration tester", "reverse engineer"))
-    # Focus areas (per Q8 — verbatim upstream topics)
-    for area in ("CTF", "ransomware", "BIN"):
-        assert area in user, f"USER.md missing focus area {area}"
+    # Focus areas (per Q8 — verbatim upstream topics). Case-insensitive match
+    # because USER.md uses title-case section headings ("Ransomware").
+    user_lower = user.lower()
+    for area in ("ctf", "ransomware", "bin"):
+        assert area in user_lower, f"USER.md missing focus area {area}"
 
 
 def test_user_english_only(user):

@@ -16,7 +16,7 @@ from pathlib import Path
 from typing import List, Optional
 
 try:
-    from PyQt6.QtCore import Qt, QTimer
+    from PyQt6.QtCore import Qt, QTimer, QObject, pyqtSignal
     from PyQt6.QtGui import QFont, QTextCursor
     from PyQt6.QtWidgets import (
         QApplication,
@@ -47,6 +47,13 @@ ROUTES = ["EXEC", "CODE", "REVERSE", "PENTEST", "GAME", "RESEARCH", "CREATIVE"]
 PROFILES = ["max-breaker", "builder", "research", "creative"]
 
 
+class _LogBridge(QObject):
+    """Thread-safe bridge: workers emit append(text) from any thread;
+    the GUI's connected slot runs on the main thread via Qt's queued signal."""
+    append = pyqtSignal(str)
+    profile_changed = pyqtSignal(str)
+
+
 def hermes_home() -> Path:
     env = os.environ.get("ATHENA_HOME") or os.environ.get("HERMES_HOME")
     if env:
@@ -70,6 +77,9 @@ class AthenaMainWindow(QMainWindow):
 
         self.selected_profile: str = "max-breaker"
         self.log_lines: List[str] = []
+
+        self._log_bridge = _LogBridge()
+        self._log_bridge.append.connect(self._on_log_message)
 
         self._build_ui()
         self._wire_buttons()
@@ -221,7 +231,7 @@ class AthenaMainWindow(QMainWindow):
         self.btn_verify.clicked.connect(lambda: self.run_cli(["verify", "--json"]))
         self.btn_restore.clicked.connect(self._on_restore)
         self.btn_launch.clicked.connect(self._on_launch)
-        self.btn_quit.clicked.clicked.connect(self.close)  # type: ignore[attr-defined]
+        self.btn_quit.clicked.connect(self.close)
 
     def _on_profile_change(self, btn: QRadioButton) -> None:
         self.selected_profile = btn.text()
@@ -288,9 +298,13 @@ class AthenaMainWindow(QMainWindow):
         threading.Thread(target=worker, daemon=True).start()
 
     def _append_log(self, line: str) -> None:
+        """Called from any thread. Emits via bridge so the slot runs on UI thread."""
+        self._log_bridge.append.emit(line)
+
+    def _on_log_message(self, line: str) -> None:
+        """Slot — runs on the GUI thread. Safe to touch QPlainTextEdit."""
         for ln in line.splitlines():
             self.log_lines.append(ln)
-            # QPlainTextEdit is not thread-safe; use appendPlainText via signal
             self.log.appendPlainText(ln)
 
     def _refresh_status(self) -> None:

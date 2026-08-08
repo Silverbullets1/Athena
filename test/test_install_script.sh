@@ -82,6 +82,10 @@ assert_not_file() {
 
 # --- install ---
 echo "=== install.sh ==="
+# Capture pre-install baseline for files install must NOT touch
+AGENTS_BEFORE=$(cat "$HERMES_ROOT/AGENTS.md")
+CONFIG_BEFORE=$(cat "$HERMES_ROOT/config.yaml")
+
 "$INSTALL_SH" "$HERMES_ROOT" "max-breaker" "--yes" >/dev/null 2>&1
 RC=$?
 assert_eq "install exit code" "0" "$RC"
@@ -110,9 +114,11 @@ else
     FAIL=$((FAIL + 1))
 fi
 
-# Verify AGENTS.md + config.yaml untouched
-assert_eq "AGENTS.md untouched" "agent" "$(cat "$HERMES_ROOT/AGENTS.md")"
-assert_eq "config.yaml untouched" "gateway: x" "$(cat "$HERMES_ROOT/config.yaml")"
+# Verify AGENTS.md + config.yaml untouched (re-read post-install, compare to baseline)
+AGENTS_AFTER=$(cat "$HERMES_ROOT/AGENTS.md")
+CONFIG_AFTER=$(cat "$HERMES_ROOT/config.yaml")
+assert_eq "AGENTS.md unchanged" "$AGENTS_BEFORE" "$AGENTS_AFTER"
+assert_eq "config.yaml unchanged" "$CONFIG_BEFORE" "$CONFIG_AFTER"
 
 # Verify scripts are executable
 for s in athena-install.sh athena-uninstall.sh athena-verify.sh athena-release.py build-dmg.sh; do
