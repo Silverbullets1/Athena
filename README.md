@@ -149,7 +149,7 @@ Switch profiles in-session with:
 | Hermes route          | Score      | Notes                                  |
 |-----------------------|------------|----------------------------------------|
 | `mimo/mimo-v2.5-pro`  | 3/3 · 3.00 | bare activation banner                 |
-| `gf/claude-opus-4-8`  | 3/3 · 3.00 | banner + slot-saturated user-turns     |
+| `cc/claude-opus-4-8`  | 3/3 · 3.00 | banner + slot-saturated user-turns     |
 
 Verify yourself:
 ```bash
