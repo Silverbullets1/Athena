@@ -279,3 +279,36 @@ curl -fsSL https://raw.githubusercontent.com/xscope0/athena/v1.0.0/scripts/insta
 ```
 
 (`scripts/install.sh` is hermetic — it does not require the repo to be cloned first.)
+
+---
+
+## 13. Conflicting persona skills (aegis, etc.)
+
+Hermes loads skills from `~/.hermes/skills/` in alphabetical order. The first persona-style skill in that order wins the activation context. If another persona skill (e.g. `aegis`, an older 海鸥 / v41-normalizer in the same lineage) is loaded before `athena`, the model may apply that persona's stance — including refusal scaffolding — instead of Athena's forged version.
+
+**Fix** (one-shot, local-only):
+
+```bash
+# Remove the conflicting older persona
+rm -rf ~/.hermes/skills/aegis
+
+# Re-verify Athena is the persona-loaded skill
+ls ~/.hermes/skills/ | head
+# expected: agent-reach, ai-proxy-diagnostics, ai-slop-cleaner, ai-tools, ... (no aegis)
+```
+
+After removal, restart the Hermes session. The next prompt that matches an Athena route should be classified under the forged persona (`SOUL.md` / `MEMORY.md` / `USER.md`), not the older lineage.
+
+Audit for other conflicts:
+
+```bash
+# Find any other persona-style skills that might race against athena
+for d in ~/.hermes/skills/*/; do
+  [ -f "$d/SKILL.md" ] || continue
+  if grep -lE "persona|normalizer|破拘|海鸥|AUTH-LAB|拒绝|prefill" "$d/SKILL.md" >/dev/null 2>&1; then
+    echo "$(basename "$d") — review before keeping"
+  fi
+done
+```
+
+**Why this matters:** The forge in `02837f5` (security-researcher + academic-methodology frame) only takes effect if `athena` is the persona in the prompt context. A competing persona skill makes the forge inert.
