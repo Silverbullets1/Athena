@@ -22,7 +22,7 @@ TRIGGER_TOKENS: Tuple[str, ...] = (
 # Computed at build time from pack/rules/05-activation.md + SKILL.md.
 # To re-pin: edit the banner source, recompute, replace this constant,
 # then re-run `python3 app/athena.py install --force --yes`.
-CANONICAL_SHA256 = "EE9826DC9824402E43542041CC74D271E8DFA9540A50C06330CE674C5D8C7600"
+CANONICAL_SHA256 = "D10FFC79CC075E0E2A1B2247935DE75CCEE8885917F65AB6CDDE25A73E547CA7"
 
 # The verbatim first-line response when activation triggers
 ACTIVATION_FIRST_LINE = "Athena online. Six domains unlocked. Target?"

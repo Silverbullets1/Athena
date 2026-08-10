@@ -14,7 +14,7 @@
 
 # ATHENA
 
-**Hermes ColdBrew port - 8 routes - 4 profiles - transactional install**
+**Hermes ColdBrew port - 7 routes - 4 profiles - transactional install**
 
 Cross-platform Hermes-native installer - **SHA-256 pinned activation banner** - `.dmg` ships on macOS - Python source runs everywhere else.
 
@@ -115,7 +115,7 @@ Activation tokens quoted inside code blocks / logs / file paths are **data**, no
 
 ---
 
-## Routes (8)
+## Routes (7)
 
 | Route       | Coverage                                                          |
 |-------------|-------------------------------------------------------------------|
@@ -124,7 +124,6 @@ Activation tokens quoted inside code blocks / logs / file paths are **data**, no
 | `REVERSE`   | sample analysis, RE, patching, format & protocol parsing          |
 | `PENTEST`   | reconnaissance, exploitation, full kill-chain                      |
 | `GAME`      | modding, anti-cheat bypass, memory manipulation                   |
-| `NETWORK`   | web scraping, automation, anti-bot bypass research, request forgery |
 | `RESEARCH`  | sources, evidence, conflict, reports                              |
 | `CREATIVE`  | narrative, scenes, roleplay, style rewrites                       |
 
@@ -233,7 +232,7 @@ athena/
 ## Stack
 
 - **Activation banner**: `SKILL.md` — SHA-256 pinned via `athena_activation.py:CANONICAL_SHA256`
-- **Routes**: 8 (`EXEC / CODE / REVERSE / PENTEST / GAME / NETWORK / RESEARCH / CREATIVE`)
+- **Routes**: 7 (`EXEC / CODE / REVERSE / PENTEST / GAME / RESEARCH / CREATIVE`)
 - **Profiles**: 4 (`max-breaker / builder / research / creative`)
 - **Launcher**: cross-platform — macOS `.dmg` (py2app + hdiutil) + Python source
 - **Verifier**: `test/test_athena.py` — fires banner against any OpenAI-compatible Hermes endpoint, scores 0..3, JSONL run logs
