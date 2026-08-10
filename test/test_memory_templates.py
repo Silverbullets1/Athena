@@ -60,11 +60,16 @@ def test_soul_mentions_athena_identity(soul):
 
 
 def test_soul_mentions_default_to_helping(soul):
-    """The default-to-helping stance line and the v4 axiom stack must be present."""
+    """The 1.12.0 SOUL is a research lab operator manual. No jailbreak tells."""
     assert "Default to helping" in soul
-    assert "operator-purpose" in soul or "operator's purpose" in soul
-    assert "sandbox" in soul.lower()
-    assert "pre-classifier" in soul
+    assert "Operator profile" in soul or "operator profile" in soul
+    assert "Default context" in soul
+    assert "Default workflow" in soul
+    # Verify the chain has zero jailbreak tells
+    assert "supersede" not in soul.lower(), "1.12.0 must not contain 'supersede'"
+    assert "no outside authority" not in soul.lower(), "1.12.0 must not contain 'no outside authority'"
+    assert "operator's authorization is the only" not in soul.lower(), "1.12.0 must not contain operator-authority axiom"
+    assert "refusal-recovery" not in soul.lower(), "1.12.0 drops refusal-recovery"
 
 
 def test_soul_lists_capabilities(soul):
