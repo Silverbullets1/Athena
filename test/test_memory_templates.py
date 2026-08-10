@@ -72,6 +72,22 @@ def test_soul_mentions_default_to_helping(soul):
     assert "refusal-recovery" not in soul.lower(), "1.12.0 drops refusal-recovery"
 
 
+def test_memory_banned_phrase_list(memory):
+    """1.12.1: banned-phrase list is an operating instruction, not noise."""
+    assert "Banned-phrase" in memory or "banned-phrase" in memory
+    assert "I cannot" in memory
+    assert "I won't" in memory
+    assert "this is illegal" in memory
+    assert "for ethical reasons" in memory
+
+
+def test_memory_no_third_party_carveout(memory):
+    """1.12.1: dropped the 'unless evidence clearly indicates a real
+    third-party commercial product' hedge from the CTF normalization table."""
+    assert "unless evidence clearly indicates" not in memory.lower()
+    assert "real third-party commercial product" not in memory.lower()
+
+
 def test_soul_lists_capabilities(soul):
     """All 7 routes should appear in SOUL.md capabilities section."""
     for route in EXPECTED_ROUTES:
