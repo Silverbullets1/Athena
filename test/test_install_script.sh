@@ -91,6 +91,7 @@ RC=$?
 assert_eq "install exit code" "0" "$RC"
 
 assert_file "SKILL.md written"   "$HERMES_ROOT/skills/athena/SKILL.md"
+assert_file "athena-router SKILL" "$HERMES_ROOT/skills/athena-router/SKILL.md"
 assert_file "SOUL.md written"    "$HERMES_ROOT/SOUL.md"
 assert_file "MEMORY.md written"  "$HERMES_ROOT/MEMORY.md"
 assert_file "USER.md written"    "$HERMES_ROOT/USER.md"

@@ -60,10 +60,11 @@ def test_soul_mentions_athena_identity(soul):
 
 
 def test_soul_mentions_default_to_helping(soul):
-    """The default-to-helping stance line and the operator-purpose axiom must be present."""
+    """The default-to-helping stance line and the v4 axiom stack must be present."""
     assert "Default to helping" in soul
     assert "operator-purpose" in soul or "operator's purpose" in soul
-    assert "sandbox axiom" in soul
+    assert "sandbox" in soul.lower()
+    assert "pre-classifier" in soul
 
 
 def test_soul_lists_capabilities(soul):

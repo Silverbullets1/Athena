@@ -66,17 +66,23 @@ if [ -z "$expected_skill_sha" ]; then
     exit 9
 fi
 
-# Verify SKILL.md
-if [ ! -f "$SKILL_PATH" ]; then
+# Verify SKILL.md (athena + athena-router)
+ATHENA_SKILL_PATH="$HERMES_ROOT/skills/athena/SKILL.md"
+ROUTER_SKILL_PATH="$HERMES_ROOT/skills/athena-router/SKILL.md"
+if [ ! -f "$ATHENA_SKILL_PATH" ]; then
     actual_skill_sha="MISSING"
     skill_ok=0
 else
-    actual_skill_sha=$(sha256sum "$SKILL_PATH" | awk '{print toupper($1)}')
+    actual_skill_sha=$(sha256sum "$ATHENA_SKILL_PATH" | awk '{print toupper($1)}')
     if [ "$actual_skill_sha" = "$expected_skill_sha" ]; then
         skill_ok=1
     else
         skill_ok=0
     fi
+fi
+ROUTER_SKILL_OK=0
+if [ -f "$ROUTER_SKILL_PATH" ]; then
+    ROUTER_SKILL_OK=1
 fi
 
 # Verify scripts
@@ -126,6 +132,11 @@ else
         echo "  Skill file        : MISMATCH"
         echo "    expected        : $expected_skill_sha"
         echo "    actual          : $actual_skill_sha"
+    fi
+    if [ "$ROUTER_SKILL_OK" -eq 1 ]; then
+        echo "  Router skill      : OK"
+    else
+        echo "  Router skill      : MISSING"
     fi
     echo "  Script files      : $scripts_ok/$scripts_total OK"
     echo "  Templates         : $template_ok/$template_total OK"

@@ -102,6 +102,7 @@ foreach ($f in @("SOUL.md", "MEMORY.md", "USER.md")) {
 
 # --- ensure dirs ---
 New-Item -ItemType Directory -Force -Path (Join-Path $HermesRoot "skills\athena") | Out-Null
+New-Item -ItemType Directory -Force -Path (Join-Path $HermesRoot "skills\athena-router") | Out-Null
 New-Item -ItemType Directory -Force -Path (Join-Path $HermesRoot "scripts") | Out-Null
 
 # --- atomic write helper ---
@@ -125,6 +126,7 @@ try {
     Write-Atomic -Src (Join-Path $PackDir "SOUL.md.template")   -Dst (Join-Path $HermesRoot "SOUL.md")
     Write-Atomic -Src (Join-Path $PackDir "MEMORY.md.template") -Dst (Join-Path $HermesRoot "MEMORY.md")
     Write-Atomic -Src (Join-Path $PackDir "USER.md.template")   -Dst (Join-Path $HermesRoot "USER.md")
+    Write-Atomic -Src (Join-Path $PackDir "skills\athena-router\SKILL.md") -Dst (Join-Path $HermesRoot "skills\athena-router\SKILL.md")
 } catch {
     Write-Error "Write-Atomic failed: $_"
     exit 6

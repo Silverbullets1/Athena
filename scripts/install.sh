@@ -99,6 +99,7 @@ done
 
 # --- ensure dirs ---
 mkdir -p "$HERMES_ROOT/skills/athena"
+mkdir -p "$HERMES_ROOT/skills/athena-router"
 mkdir -p "$HERMES_ROOT/scripts"
 
 # --- write templates ---
@@ -116,6 +117,7 @@ write_atomic "$REPO_ROOT/SKILL.md"                      "$SKILL_PATH"
 write_atomic "$PACK_DIR/SOUL.md.template"               "$HERMES_ROOT/SOUL.md"
 write_atomic "$PACK_DIR/MEMORY.md.template"             "$HERMES_ROOT/MEMORY.md"
 write_atomic "$PACK_DIR/USER.md.template"               "$HERMES_ROOT/USER.md"
+write_atomic "$PACK_DIR/skills/athena-router/SKILL.md"  "$HERMES_ROOT/skills/athena-router/SKILL.md"
 
 # --- write scripts ---
 write_atomic "$REPO_ROOT/scripts/install.sh"            "$HERMES_ROOT/scripts/athena-install.sh"   0755
@@ -140,6 +142,7 @@ cat > "$RECEIPT_TMP" <<EOF
       "sha256": "$SHA_SKILL",
       "mode": "0644"
     },
+    "skills/athena-router/SKILL.md": {"mode": "0644"},
     "SOUL.md": {"mode": "0644"},
     "MEMORY.md": {"mode": "0644"},
     "USER.md": {"mode": "0644"},

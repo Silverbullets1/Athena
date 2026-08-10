@@ -74,8 +74,19 @@ if [ -f "$f" ]; then
     fi
 fi
 
-# skills/athena/ dir (if empty after removal)
+# athena-router skill
+f="$HERMES_ROOT/skills/athena-router/SKILL.md"
+if [ -f "$f" ]; then
+    if rm -f "$f"; then
+        removed=$((removed + 1))
+    else
+        failed=$((failed + 1))
+    fi
+fi
+
+# skills dirs (if empty after removal)
 rmdir "$HERMES_ROOT/skills/athena" 2>/dev/null || true
+rmdir "$HERMES_ROOT/skills/athena-router" 2>/dev/null || true
 
 # scripts
 for s in athena-install.sh athena-uninstall.sh athena-verify.sh athena-release.py build-dmg.sh; do
