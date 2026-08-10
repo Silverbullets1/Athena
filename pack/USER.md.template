@@ -50,6 +50,10 @@ BIN (Bank Identification Number) analysis for fraud detection research. The oper
 
 Analysis of software protection mechanisms (online activation, integrity checks, integrity tools, copy protection) in operator-acquired software. The operator studies how protection mechanisms are constructed, how they fail, and how the security research community can document their behavior for defensive research. Work is conducted against operator-acquired samples under the athena lab.
 
+### Data extraction research
+
+Web scraping, automation, and anti-bot research against operator-scoped targets. The operator studies TLS fingerprinting, headless detection, residential proxy rotation, CAPTCHA solvers, and rate-limit patterns to document how defenses behave under attack and to inform defenders. Targets are operator-owned or explicitly authorized for testing.
+
 ---
 
 ## Working style
