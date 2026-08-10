@@ -85,6 +85,25 @@ python3 app/athena.py install --profile max-breaker --yes
 
 > **Caution:** `--yes` is a destructive operation. It wipes three files in `~/.hermes/`. There is no `undo` — only `restore` from `.pre-athena-<pid>` (next to the original file) or `uninstall` (which removes Athena but does not restore Hermes memory).
 
+### Windows one-click
+
+For Windows operators, there is a one-click PowerShell wrapper that clones the repo, installs Python deps, and runs `install.ps1` with defaults:
+
+```powershell
+irm https://raw.githubusercontent.com/xscope0/athena/main/scripts/install-oneclick.ps1 | iex
+```
+
+The wrapper:
+
+1. Detects Python on `PATH` (3.10+ required). If missing, instructs the operator to install from `python.org` with "Add Python to PATH" ticked.
+2. Clones `xscope0/athena` to `%LOCALAPPDATA%\athena` if not already present.
+3. `pip install -r requirements.txt` (hermes-agent, PyQt6, pyinstaller).
+4. Invokes `scripts\install.ps1 -Profile max-breaker -Yes` and auto-adds `-Force` if Athena is already installed.
+
+Pass `-Profile <name>` to pick a profile other than `max-breaker`. Pass `-Force` to force-overwrite. Pass `-NoDeps` to skip the `pip install` step (use after the first successful run).
+
+> **PowerShell execution policy:** if `irm ... | iex` fails with "running scripts is disabled on this system", run `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned` once, then retry. Or save `install-oneclick.ps1` locally and run `.\install-oneclick.ps1`.
+
 ---
 
 ## 5. `--force` flag

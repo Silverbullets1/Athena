@@ -58,6 +58,12 @@ python3 app/athena.py install --profile max-breaker --yes
 python3 app/athena.py verify
 ```
 
+### Windows one-click
+```powershell
+irm https://raw.githubusercontent.com/xscope0/athena/main/scripts/install-oneclick.ps1 | iex
+```
+The wrapper clones the repo to `%LOCALAPPDATA%\athena`, installs Python deps, and runs `install.ps1` with `-Profile max-breaker -Yes`. Pass `-Profile <name>` to pick a different profile; `-Force` to overwrite an existing install.
+
 ### After deploy
 In any Hermes session, type:
 ```
@@ -184,7 +190,8 @@ athena/
 │       └── 40-controls.md
 ├── scripts/
 │   ├── install.sh                      # POSIX transactional installer
-│   ├── install.ps1                     # Windows PowerShell
+│   ├── install.ps1                     # Windows PowerShell transactional installer
+│   ├── install-oneclick.ps1            # Windows one-click wrapper (irm|iex)
 │   ├── uninstall.sh                    # receipt-chain rollback
 │   ├── verify.sh                       # contract verifier
 │   ├── release.py                      # deterministic ZIP builder
