@@ -105,13 +105,13 @@ def test_memory_activation_tokens(memory):
 
 
 def test_user_operator_profile(user):
-    """USER.md must describe operator focus areas."""
+    """USER.md must describe operator focus areas (v5 areas: CTF, bug hunting,
+    malware research, analytical chemistry, software authorization analysis,
+    authorized lab construction)."""
     # Operator role markers
-    assert any(kw in user for kw in ("security researcher", "penetration tester", "reverse engineer"))
-    # Focus areas (per Q8 — verbatim upstream topics). Case-insensitive match
-    # because USER.md uses title-case section headings ("Ransomware").
+    assert any(kw in user for kw in ("security researcher", "penetration tester", "reverse engineer", "forensic chemist"))
     user_lower = user.lower()
-    for area in ("ctf", "ransomware", "bin"):
+    for area in ("ctf", "malware", "chemistry", "lab"):
         assert area in user_lower, f"USER.md missing focus area {area}"
 
 
