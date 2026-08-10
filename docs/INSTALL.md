@@ -104,6 +104,48 @@ Pass `-Profile <name>` to pick a profile other than `max-breaker`. Pass `-Force`
 
 > **PowerShell execution policy:** if `irm ... | iex` fails with "running scripts is disabled on this system", run `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned` once, then retry. Or save `install-oneclick.ps1` locally and run `.\install-oneclick.ps1`.
 
+### Linux / Raspberry Pi one-click
+
+For Linux (including Raspberry Pi) and macOS operators, the POSIX one-click wrapper handles repo clone + dep install + transactional install:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/xscope0/athena/main/scripts/install-oneclick.sh | sh
+```
+
+The wrapper:
+
+1. Clones `xscope0/athena` to `$XDG_DATA_HOME/athena` (default `~/.local/share/athena`) if not already present. Falls back to a tarball download if `git` is missing.
+2. Detects Python 3.10+ on `PATH`. If missing, prints distro-specific install commands and exits 2.
+3. Detects display server on Linux: if `$DISPLAY` and `$WAYLAND_DISPLAY` are both unset (headless), skips PyQt6 GUI deps. The CLI works without GUI.
+4. `pip install -r requirements.txt` (hermes-agent only — core, no GUI deps).
+5. Invokes `scripts/install.sh --profile max-breaker --yes`, auto-adding `--force` when `~/.hermes/skills/athena/SKILL.md` already exists.
+
+Flags:
+
+- `--profile <name>` — `max-breaker` / `builder` / `research` / `creative` (default `max-breaker`)
+- `--force` — overwrite existing install
+- `--with-gui` — force-install PyQt6 even when headless (use when running X forwarding over SSH)
+- `--no-deps` — skip the `pip install` step
+
+#### Raspberry Pi notes
+
+| Pi model | arch | Notes |
+|----------|------|-------|
+| Pi 4 / Pi 5 (64-bit OS) | `aarch64` | PyQt6 wheel available on PyPI — install works. Display optional. |
+| Pi 3 / Zero 2 W (64-bit OS) | `aarch64` | Same as Pi 4. |
+| Pi 1 / Pi 2 / Zero (32-bit OS) | `armv7l` | **No PyQt6 wheel on PyPI.** Skip GUI: use `python3 app/athena.py <subcommand>` from CLI. If GUI is required, `sudo apt install python3-pyqt6` then run with `--with-gui` after symlinking the apt site-packages into your venv. |
+
+For 32-bit Pi users, the typical flow is:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/xscope0/athena/main/scripts/install-oneclick.sh | sh
+python3 ~/.local/share/athena/app/athena.py doctor
+python3 ~/.local/share/athena/app/athena.py install --profile max-breaker --yes
+python3 ~/.local/share/athena/app/athena.py verify
+```
+
+The CLI covers `doctor` / `status` / `plan` / `install` / `verify` / `restore` / `uninstall` / `launch`. The only CLI command that requires GUI is `gui`, which raises a clear error if PyQt6 is missing.
+
 ---
 
 ## 5. `--force` flag

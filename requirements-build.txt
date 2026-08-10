@@ -1,0 +1,7 @@
+# Athena build dependencies (optional, macOS only)
+# Install with: python3 -m pip install -r requirements-build.txt
+#
+# Needed only for `bash scripts/build_dmg.sh` (PyInstaller + hdiutil
+# for the .dmg pipeline). Skip on Linux / Raspberry Pi / Windows.
+
+pyinstaller>=6.0,<7.0

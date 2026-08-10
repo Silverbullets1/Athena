@@ -1,0 +1,17 @@
+# Athena GUI dependencies (optional)
+# Install with: python3 -m pip install -r requirements-gui.txt
+#
+# Needed only for `python3 app/athena.py gui`. Skip on headless
+# servers and Raspberry Pi setups without a display.
+#
+# Platform notes:
+#   macOS / Linux x86_64 / Linux aarch64 (Pi 4/5 64-bit):
+#       wheels available on PyPI — pip install just works.
+#   Linux armv7l (Pi 1/2/3 Zero 32-bit):
+#       no PyQt6 wheel on PyPI. Use the system package instead:
+#           sudo apt install python3-pyqt6
+#       then add the apt-installed site-packages to PYTHONPATH or
+#       symlink. Headless Pi users should skip the GUI entirely
+#       and use the CLI (`python3 app/athena.py <subcommand>`).
+
+PyQt6>=6.6,<7.0

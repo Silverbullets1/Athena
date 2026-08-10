@@ -1,11 +1,9 @@
-# Athena runtime dependencies
+# Athena runtime dependencies (core)
 # Install with: python3 -m pip install -r requirements.txt
+#
+# Core: hermes-agent only. Runs the CLI on any platform — Linux,
+# macOS, Raspberry Pi (aarch64), WSL2, headless servers.
+# No GUI, no PyInstaller.
 
 # Hermes agent harness (required)
 hermes-agent>=0.7,<1.0
-
-# PyQt6 GUI (optional — only needed for `athena.py gui`)
-PyQt6>=6.6,<7.0
-
-# PyInstaller for macOS .app bundling (optional — only needed for build_dmg.sh)
-pyinstaller>=6.0,<7.0

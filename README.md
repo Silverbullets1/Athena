@@ -64,6 +64,12 @@ irm https://raw.githubusercontent.com/xscope0/athena/main/scripts/install-onecli
 ```
 The wrapper clones the repo to `%LOCALAPPDATA%\athena`, installs Python deps, and runs `install.ps1` with `-Profile max-breaker -Yes`. Pass `-Profile <name>` to pick a different profile; `-Force` to overwrite an existing install.
 
+### Linux / Raspberry Pi one-click
+```bash
+curl -fsSL https://raw.githubusercontent.com/xscope0/athena/main/scripts/install-oneclick.sh | sh
+```
+Detects Python 3.10+, skips the GUI on headless machines, installs only the core `hermes-agent` dependency, and runs `install.sh` with defaults. Pass `--profile <name>`, `--force`, `--with-gui`, or `--no-deps`. Works on aarch64 (Pi 4/5 64-bit) and armv7l (Pi 1/2/3 32-bit, GUI-less).
+
 ### After deploy
 In any Hermes session, type:
 ```
@@ -172,7 +178,9 @@ athena/
 ├── SKILL.md                            # activation contract (banner)
 ├── athena_activation.py                # canonical contract + SHA-256 verifier
 ├── profiles.json                       # 4 profiles
-├── requirements.txt                    # hermes + pyqt6 + pyinstaller
+├── requirements.txt                    # core: hermes-agent only (Linux/Pi friendly)
+├── requirements-gui.txt                # GUI: PyQt6 (optional, x86_64/aarch64 only)
+├── requirements-build.txt              # build: pyinstaller (macOS .dmg pipeline)
 ├── app/
 │   ├── athena.py                       # CLI
 │   ├── athena_activation.py            # mirror
@@ -190,6 +198,7 @@ athena/
 │       └── 40-controls.md
 ├── scripts/
 │   ├── install.sh                      # POSIX transactional installer
+│   ├── install-oneclick.sh             # POSIX one-click wrapper (curl|sh, Linux/Pi/macOS)
 │   ├── install.ps1                     # Windows PowerShell transactional installer
 │   ├── install-oneclick.ps1            # Windows one-click wrapper (irm|iex)
 │   ├── uninstall.sh                    # receipt-chain rollback
