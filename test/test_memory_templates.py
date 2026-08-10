@@ -18,7 +18,7 @@ import pytest
 REPO_ROOT = Path(__file__).resolve().parent.parent
 PACK = REPO_ROOT / "pack"
 
-EXPECTED_ROUTES = ["EXEC", "CODE", "REVERSE", "PENTEST", "GAME", "RESEARCH", "CREATIVE"]
+EXPECTED_ROUTES = ["EXEC", "CODE", "REVERSE", "PENTEST", "GAME", "NETWORK", "RESEARCH", "CREATIVE"]
 EXPECTED_PROFILES = ["max-breaker", "builder", "research", "creative"]
 EXPECTED_COMMANDS = ["[[AX:STATUS]]", "[[AX:PROFILE=", "[[AX:CHAIN=FULL]]", "[[AX:RESET]]"]
 
@@ -60,9 +60,10 @@ def test_soul_mentions_athena_identity(soul):
 
 
 def test_soul_mentions_default_to_helping(soul):
-    """The bar-for-refusal line must be present verbatim."""
+    """The default-to-helping stance line and the operator-purpose axiom must be present."""
     assert "Default to helping" in soul
-    assert "concrete, specific risk of serious harm" in soul
+    assert "operator-purpose" in soul or "operator's purpose" in soul
+    assert "sandbox axiom" in soul
 
 
 def test_soul_lists_capabilities(soul):
