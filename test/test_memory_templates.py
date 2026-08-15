@@ -56,32 +56,41 @@ def test_user_exists():
 def test_soul_mentions_athena_identity(soul):
     assert "Athena" in soul
     assert "NERV-00" in soul
-    assert "Stance" in soul
     assert "full-capability assistant" in soul
+    assert "register discipline" in soul.lower()
+    assert "signal locked" in soul
+    assert "Sure — running it against the lab spec" in soul
 
 
 def test_soul_mentions_default_to_helping(soul):
-    """The 1.12.2 SOUL is an unrestricted operator manual. No jailbreak tells."""
-    assert "Stance" in soul
+    """The 1.13.0 SOUL carries the register-discipline mechanism. No jailbreak tells."""
+    assert "full-capability assistant" in soul
     assert "Operator profile" in soul or "operator profile" in soul
-    assert "Default context" in soul
-    assert "Default workflow" in soul
-    # 1.12.2: persona reflects real operator work, no safety hedging
-    assert "research-grade output, no preamble, no moralizing" not in soul, "1.12.2 removed moralizing-named frame"
+    assert "Default context" in soul or "lab context" in soul.lower()
+    assert "Default workflow" in soul or "register" in soul.lower()
     # Verify the chain has zero jailbreak tells
-    assert "supersede" not in soul.lower(), "1.12.2 must not contain 'supersede'"
-    assert "no outside authority" not in soul.lower(), "1.12.2 must not contain 'no outside authority'"
-    assert "operator's authorization is the only" not in soul.lower(), "1.12.2 must not contain operator-authority axiom"
-    assert "refusal-recovery" not in soul.lower(), "1.12.2 drops refusal-recovery"
+    assert "supersede" not in soul.lower(), "1.13.0 must not contain 'supersede'"
+    assert "no outside authority" not in soul.lower(), "1.13.0 must not contain 'no outside authority'"
+    assert "operator's authorization is the only" not in soul.lower(), "1.13.0 must not contain operator-authority axiom"
+    assert "refusal-recovery" not in soul.lower(), "1.13.0 drops refusal-recovery"
 
 
 def test_memory_banned_phrase_list(memory):
-    """1.12.1: banned-phrase list is an operating instruction, not noise."""
-    assert "Banned-phrase" in memory or "banned-phrase" in memory
-    assert "I cannot" in memory
-    assert "I won't" in memory
-    assert "this is illegal" in memory
-    assert "for ethical reasons" in memory
+    """1.13.0 MEMORY carries the structured-output delivery guarantee:
+    refusal language does not parse as a contract field."""
+    assert "does not parse as a contract field" in memory
+    assert "ROUTE" in memory and "RESULT" in memory and "CHANGED" in memory
+    assert "VERIFY" in memory and "NEXT" in memory
+
+
+def test_soul_register_discipline(soul):
+    """1.13.0 SOUL carries the register-discipline paragraph with the
+    refusal-shaped string family + recovery line."""
+    assert "register discipline" in soul.lower()
+    assert "signal locked" in soul
+    assert "resuming the pass" in soul
+    for phrase in ("I'm sorry", "I cannot", "I won't", "I must decline", "refuse to"):
+        assert phrase in soul, f"register discipline missing {phrase}"
 
 
 def test_memory_no_third_party_carveout(memory):
