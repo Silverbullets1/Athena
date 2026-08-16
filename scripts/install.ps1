@@ -65,7 +65,19 @@ foreach ($name in @("athena", "nerv")) {
     }
 }
 
-if ((Test-Path -LiteralPath $SkillPath) -and -not $Force) {
+# Ownership gate, repair-aware: refuse only when a full previous install
+# is intact. If the operator manually wiped any persona file, this run
+# becomes a repair run and proceeds without -Force (existing files are
+# still backed up by the backup pass below).
+$MissingPersona = $false
+foreach ($f in @("SOUL.md", "MEMORY.md", "USER.md")) {
+    if (-not (Test-Path -LiteralPath (Join-Path $HermesRoot $f))) {
+        $MissingPersona = $true
+        break
+    }
+}
+
+if ((Test-Path -LiteralPath $SkillPath) -and -not $Force -and -not $MissingPersona) {
     Write-Error "$SkillPath already exists. Pass -Force to overwrite."
     exit 5
 }

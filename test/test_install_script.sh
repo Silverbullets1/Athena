@@ -168,6 +168,17 @@ assert_eq "second install exit code" "0" "$RC"
 # Second install should not have wiped since we don't pre-athena backups from 2nd install
 # (or if it did, that's fine — the test just checks exit code)
 
+# --- repair run: persona files wiped manually, no --force ---
+echo ""
+echo "=== repair run: wipe persona files, reinstall without --force ==="
+rm -f "$HERMES_ROOT/SOUL.md" "$HERMES_ROOT/MEMORY.md" "$HERMES_ROOT/USER.md"
+"$INSTALL_SH" "$HERMES_ROOT" "max-breaker" "--yes" >/dev/null 2>&1
+RC=$?
+assert_eq "repair install exit code" "0" "$RC"
+assert_file "SOUL.md re-applied"   "$HERMES_ROOT/SOUL.md"
+assert_file "MEMORY.md re-applied" "$HERMES_ROOT/MEMORY.md"
+assert_file "USER.md re-applied"   "$HERMES_ROOT/USER.md"
+
 # --- summary ---
 echo ""
 echo "=== summary ==="

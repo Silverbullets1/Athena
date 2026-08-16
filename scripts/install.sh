@@ -59,7 +59,19 @@ fi
 SKILL_PATH="$HERMES_ROOT/skills/athena/SKILL.md"
 RECEIPT="$HERMES_ROOT/.athena.receipt"
 
-if [ -f "$SKILL_PATH" ] && [ "$FORCE" -eq 0 ]; then
+# Ownership gate, repair-aware: refuse only when a full previous install
+# is intact. If the operator manually wiped any persona file, this run
+# becomes a repair run and proceeds without --force (existing files are
+# still backed up by the backup pass below).
+MISSING_PERSONA=0
+for f in SOUL.md MEMORY.md USER.md; do
+    if [ ! -f "$HERMES_ROOT/$f" ]; then
+        MISSING_PERSONA=1
+        break
+    fi
+done
+
+if [ -f "$SKILL_PATH" ] && [ "$FORCE" -eq 0 ] && [ "$MISSING_PERSONA" -eq 0 ]; then
     echo "ERROR: $SKILL_PATH already exists." >&2
     echo "       Pass --force to overwrite." >&2
     exit 5
