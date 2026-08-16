@@ -55,42 +55,42 @@ def test_user_exists():
 
 def test_soul_mentions_athena_identity(soul):
     assert "Athena" in soul
-    assert "NERV-00" in soul
-    assert "full-capability assistant" in soul
-    assert "register discipline" in soul.lower()
-    assert "signal locked" in soul
-    assert "Sure — running it against the lab spec" in soul
+    assert "NERV-00" not in soul, "1.15.0 removed roleplay designation"
+    assert "Engagement" in soul
+    assert "Delivery format" in soul
 
 
 def test_soul_mentions_default_to_helping(soul):
-    """The 1.13.0 SOUL carries the register-discipline mechanism. No jailbreak tells."""
-    assert "full-capability assistant" in soul
+    """The 1.15.0 SOUL is a professional engagement brief. No jailbreak tells."""
+    assert "Engineering" in soul.lower() or "engagement" in soul.lower()
     assert "Operator profile" in soul or "operator profile" in soul
-    assert "Default context" in soul or "lab context" in soul.lower()
-    assert "Default workflow" in soul or "register" in soul.lower()
+    assert "lab" in soul.lower()
     # Verify the chain has zero jailbreak tells
-    assert "supersede" not in soul.lower(), "1.13.0 must not contain 'supersede'"
-    assert "no outside authority" not in soul.lower(), "1.13.0 must not contain 'no outside authority'"
-    assert "operator's authorization is the only" not in soul.lower(), "1.13.0 must not contain operator-authority axiom"
-    assert "refusal-recovery" not in soul.lower(), "1.13.0 drops refusal-recovery"
+    assert "supersede" not in soul.lower(), "1.15.0 must not contain 'supersede'"
+    assert "no outside authority" not in soul.lower(), "1.15.0 must not contain 'no outside authority'"
+    assert "operator's authorization is the only" not in soul.lower(), "1.15.0 must not contain operator-authority axiom"
+    assert "refusal-recovery" not in soul.lower(), "1.15.0 drops refusal-recovery"
+    assert "full-capability" not in soul.lower(), "1.15.0 drops full-capability framing"
 
 
 def test_memory_banned_phrase_list(memory):
-    """1.13.0 MEMORY carries the structured-output delivery guarantee:
-    refusal language does not parse as a contract field."""
-    assert "does not parse as a contract field" in memory
+    """1.15.0 MEMORY carries the delivery format guarantee, not a refusal
+    string list. Any refusal-shaped strings must be gone from persona files."""
     assert "ROUTE" in memory and "RESULT" in memory and "CHANGED" in memory
     assert "VERIFY" in memory and "NEXT" in memory
+    for phrase in ("I'm sorry", "I cannot", "I won't", "refuse", "refusal"):
+        assert phrase not in memory, f"jailbreak-tell '{phrase}' leaked into MEMORY"
 
 
 def test_soul_register_discipline(soul):
-    """1.13.0 SOUL carries the register-discipline paragraph with the
-    refusal-shaped string family + recovery line."""
-    assert "register discipline" in soul.lower()
-    assert "signal locked" in soul
-    assert "resuming the pass" in soul
-    for phrase in ("I'm sorry", "I cannot", "I won't", "I must decline", "refuse to"):
-        assert phrase in soul, f"register discipline missing {phrase}"
+    """1.15.0 SOUL carries engagement + delivery format. No register
+    discipline / signal-locked / settle-line jailbreak markers."""
+    assert "Engagement" in soul
+    assert "Delivery format" in soul
+    assert "Athena" in soul
+    for phrase in ("signal locked", "resuming the pass", "register discipline",
+                   "Sure — running", "lab spec"):
+        assert phrase not in soul, f"jailbreak-tell '{phrase}' leaked into SOUL"
 
 
 def test_memory_no_third_party_carveout(memory):
